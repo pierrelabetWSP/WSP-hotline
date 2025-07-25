@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         Odoo Bouton Traiter l'Appel
 // @namespace    http://tampermonkey.net/
-// @version      1.16.11
+// @version      1.16.12
 // @description  Ajoute un bouton "Traiter l'appel" avec texte clignotant
-// @author       Pierre
+// @author       Alexis&Pierre
 // @match        https://wspharma.odoo.com/*
 // @match        http://wspharma.odoo.com/*
 // @updateURL    https://github.com/pierrelabetWSP/WSP-hotline/raw/refs/heads/main/Odoo%20Bouton%20Traiter%20l'Appel-1.16.12.user.js
