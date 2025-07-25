@@ -6,8 +6,8 @@
 // @author       Pierre
 // @match        https://wspharma.odoo.com/*
 // @match        http://wspharma.odoo.com/*
-// @updateURL    
-// @downloadURL  
+// @updateURL    https://github.com/pierrelabetWSP/WSP-hotline/raw/refs/heads/main/Odoo%20Bouton%20Traiter%20l'Appel-1.16.12.user.js
+// @downloadURL  https://github.com/pierrelabetWSP/WSP-hotline/raw/refs/heads/main/Odoo%20Bouton%20Traiter%20l'Appel-1.16.12.user.js
 // @grant        none
 // ==/UserScript==
 
