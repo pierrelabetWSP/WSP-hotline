@@ -1,23 +1,29 @@
 // ==UserScript==
 // @name         Odoo Bouton Traiter l'Appel
 // @namespace    http://tampermonkey.net/
-// @version      1.16.14
+// @version      1.16.19
 // @description  Ajoute un bouton "Traiter l'appel" avec texte clignotant
 // @author       Alexis&Pierre
 // @match        https://wspharma.odoo.com/*
 // @match        http://wspharma.odoo.com/*
-// @updateURL    https://github.com/pierrelabetWSP/WSP-hotline/raw/refs/heads/main/Odoo%20Bouton%20Traiter%20l'Appel-1.16.12.user.js
-// @downloadURL  https://github.com/pierrelabetWSP/WSP-hotline/raw/refs/heads/main/Odoo%20Bouton%20Traiter%20l'Appel-1.16.12.user.js
+// @updateURL    https://github.com/pierrelabetWSP/WSP-hotline/raw/refs/heads/main/Odoo%20Bouton%20Traiter%20l'Appel-1.16.17.user.js
+// @downloadURL  https://github.com/pierrelabetWSP/WSP-hotline/raw/refs/heads/main/Odoo%20Bouton%20Traiter%20l'Appel-1.16.17.user.js
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=odoo.com
 // @grant        none
 // ==/UserScript==
 
 (function() {
     'use strict';
-     if (!window.location.href.includes('helpdesk.ticket&view')) {
-    console.log("URL non conforme (pas de helpdesk.ticket&view), script interrompu.");
-    return;
-     }
+    // Ne pas exécuter le script sur la vue Kanban Project Task spécifiée
+    if (window.location.href.includes('#action=615&model=project.task&view_type=kanban&cids=1&menu_id=397')) {
+        console.log('Script désactivé sur cette vue Kanban Project Task.');
+        return;
+    }
+    // Ne pas exécuter le script sur toute vue Project Task (liste/form/kanban)
+    if (window.location.href.includes('project.task&view_type')) {
+        console.log('Script désactivé sur les vues Project Task.');
+        return;
+    }
 
 
 
@@ -260,7 +266,7 @@
                 btn.innerText = 'Mettre en Attente';
                 btn.className = 'btn btn-warning';
                 setTimeout(() => {
-                    ajouterTexteCligonotant();
+                    ajouterTexteClignotant();
                 }, 500);
             } else {
                 // Toujours afficher 'Traiter l\'appel' si non en traitement
@@ -305,7 +311,7 @@
                         // 2. Mettre à jour l'interface
                         btn.innerText = 'Mettre en Attente';
                         btn.className = 'btn btn-warning';
-                        ajouterTexteCligonotant();
+                        ajouterTexteClignotant();
 
                         // 3. Sauvegarder
                         const btnEnregistrer = document.querySelector('button.o_form_button_save, button[data-hotkey="s"]');
@@ -341,7 +347,7 @@
                         // 3. Mettre à jour l'interface
                         btn.innerText = 'Mettre en Attente';
                         btn.className = 'btn btn-warning';
-                        ajouterTexteCligonotant();
+                        ajouterTexteClignotant();
 
                         // 4. Sauvegarder
                         const btnEnregistrer = document.querySelector('button.o_form_button_save, button[data-hotkey="s"]');
@@ -374,7 +380,7 @@
                     // 2. Mettre à jour l'interface
                     btn.innerText = 'Traiter l\'appel';
                     btn.className = 'btn btn-primary';
-                    supprimerTexteCligonotant();
+                    supprimerTexteClignotant();
 
                     if (ticketId) {
                         sauvegarderEtat(false, ticketId);
@@ -394,7 +400,7 @@
     }
 
     // Fonction pour supprimer le texte clignotant
-    function supprimerTexteCligonotant() {
+    function supprimerTexteClignotant() {
         console.log("Suppression du texte clignotant");
         const texteContainer = document.getElementById('texte-clignotant-container');
         if (texteContainer) {
@@ -403,7 +409,7 @@
     }
 
     // Fonction pour ajouter le texte clignotant
-    function ajouterTexteCligonotant() {
+    function ajouterTexteClignotant() {
         console.log("Ajout du texte clignotant");
 
         // Vérifier si l'élément existe déjà
@@ -432,9 +438,9 @@
 
         // Ajouter l'image de chargement
         const loadingImg = document.createElement('img');
-        loadingImg.src = 'https://i.gifer.com/XOsX.gif';
-        loadingImg.style.width = '25px';
-        loadingImg.style.height = '25px';
+        loadingImg.src = 'https://i.gifer.com/5EjY.gif';
+        loadingImg.style.width = '35px';
+        loadingImg.style.height = '35px';
         loadingImg.style.flexShrink = '0';
 
         // Créer le texte
@@ -490,7 +496,7 @@
                     if (boutonTraiter) {
                         boutonTraiter.innerText = 'Mettre en Attente';
                         boutonTraiter.className = 'btn btn-warning';
-                        ajouterTexteCligonotant();
+                        ajouterTexteClignotant();
                     }
                     resolve(boutonTraiter && boutonTraiter.innerText === 'Mettre en Attente');
                 }, 300);
@@ -520,7 +526,7 @@
                     try {
                         // 1. Supprimer le texte clignotant en premier
                         console.log("Suppression du texte clignotant");
-                        supprimerTexteCligonotant();
+                        supprimerTexteClignotant();
                         await new Promise(resolve => setTimeout(resolve, 200));
 
                         // 2. Mettre à jour l'interface du bouton
@@ -850,16 +856,30 @@
         // Vérifier si nous sommes sur la page de création de ticket
         if (window.location.href.includes('model=helpdesk.ticket&view_type=form')) {
             console.log("Page de création de ticket détectée, nettoyage des états de traitement");
-            // Nettoyer tous les états de traitement existants
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith('etatTraitement_')) {
-                    localStorage.removeItem(key);
+            // Nettoyer tous les états de traitement existants (collecte des clés avant suppression)
+            (function() {
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (!key) continue;
+                    if (key.startsWith('etatTraitement_') || key.startsWith('dernierChangement_')) {
+                        keysToRemove.push(key);
+                    }
                 }
-                if (key && key.startsWith('dernierChangement_')) {
-                    localStorage.removeItem(key);
+                keysToRemove.forEach(k => localStorage.removeItem(k));
+            })();
+            // Nettoyer tous les états de traitement existants (collecte des clés avant suppression)
+            (function() {
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (!key) continue;
+                    if (key.startsWith('etatTraitement_') || key.startsWith('dernierChangement_')) {
+                        keysToRemove.push(key);
+                    }
                 }
-            }
+                keysToRemove.forEach(k => localStorage.removeItem(k));
+            })();
         }
 
         if (document.readyState === 'complete') {
@@ -877,7 +897,7 @@
                     if (boutonTraiter) {
                         boutonTraiter.innerText = 'Mettre en Attente';
                         boutonTraiter.className = 'btn btn-warning';
-                        ajouterTexteCligonotant();
+                        ajouterTexteClignotant();
                     }
                 }
 
@@ -1004,8 +1024,8 @@
             characterData: true
         });
 
-        // Mettre à jour l'animation toutes les 2 secondes
-        setInterval(mettreAJourAnimationTickets, 2000);
+        // Mettre à jour l'animation toutes les 4 secondes
+        setInterval(mettreAJourAnimationTickets, 4000);
     }
 
     // Appeler l'initialisation de l'animation au démarrage
@@ -1307,7 +1327,7 @@
             cellRdv.classList.add('rdv-clignote-depasse');
             cellRdv.classList.remove('rdv-clignote-orange', 'rdv-clignote-rouge');
 
-            const rdvKey = `_{nomUser}_depasse_${cellRdv.textContent.trim()}_${nomPharma}`;
+            const rdvKey = `_${nomUser}_depasse_${cellRdv.textContent.trim()}_${nomPharma}`;
             if (!localStorage.getItem('notifFermee_' + rdvKey)) {
                 afficherNotifRdv(`${nomUser} ⚠️ RDV dépassé pour ${nomPharma} (${hh}:${min})`, rdvKey, true);
             }
@@ -1329,6 +1349,43 @@
         }
     });
 }
-    setInterval(scanRappelsRdv, 2000); // toutes les 2s
+    setInterval(scanRappelsRdv, 4000); // toutes les 4s
     setTimeout(scanRappelsRdv, 500); // au chargement
+
+    // Routine de relance périodique limitée à la vue liste (toutes les 15 secondes)
+    setInterval(() => {
+        try {
+            if (window.location.href.includes('model=helpdesk.ticket&view_type=list')) {
+                mettreAJourAnimationTickets();
+                scanRappelsRdv();
+            }
+        } catch (e) {
+            console.error("Erreur lors de la relance périodique (vue liste):", e);
+        }
+    }, 15000);
+
+    // Routine de relance périodique dédiée à la fiche ticket (toutes les 30 secondes)
+    setInterval(() => {
+        try {
+            if (window.location.href.includes('model=helpdesk.ticket') && window.location.href.includes('view_type=form')) {
+                ajouterBoutonTraiter();
+                modifierBoutonCloture();
+                masquerBoutonsTimer();
+                // Restaurer l'état si nécessaire
+                const ticketId = obtenirTicketId();
+                if (ticketId && recupererEtat(ticketId)) {
+                    const boutonTraiter = document.getElementById('btn-traiter-appel');
+                    if (boutonTraiter) {
+                        boutonTraiter.innerText = 'Mettre en Attente';
+                        boutonTraiter.className = 'btn btn-warning';
+                        ajouterTexteClignotant();
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erreur lors de la relance périodique (fiche ticket):", e);
+        }
+    }, 30000);
 })();
+
+
