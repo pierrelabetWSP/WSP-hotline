@@ -438,7 +438,7 @@
 
         // Ajouter l'image de chargement
         const loadingImg = document.createElement('img');
-        loadingImg.src = 'https://i.gifer.com/XlO9.gif';
+        loadingImg.src = 'https://i.gifer.com/5EjY.gif';
         loadingImg.style.width = '35px';
         loadingImg.style.height = '35px';
         loadingImg.style.flexShrink = '0';
