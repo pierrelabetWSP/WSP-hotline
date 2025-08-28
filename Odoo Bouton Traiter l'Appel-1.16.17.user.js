@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Odoo Bouton Traiter l'Appel
 // @namespace    http://tampermonkey.net/
-// @version      1.16.25
+// @version      1.16.26
 // @description  Ajoute un bouton "Traiter l'appel" avec texte clignotant
 // @author       Alexis&Pierre
 // @match        https://wspharma.odoo.com/*
@@ -1414,89 +1414,5 @@
         return null;
     }
 
-    // ================== RELANCE OPTIMISÉE ==================
-    function relancerScript(force = false) {
-        const vue = verifierUrl();
-        if (!vue) return; // stop si pas liste ni fiche
-
-        // Anti-spam
-        if (!force && window.__lastRelance && Date.now() - window.__lastRelance < 1000) {
-            return;
-        }
-        window.__lastRelance = Date.now();
-
-        console.log("♻️ Relance du script principal:", window.location.href);
-        mainScript();
-
-        try {
-            // Vue liste
-            if (vue === "list") {
-                if (!window.__intervalListe) {
-                    window.__intervalListe = setInterval(() => {
-                        if (verifierUrl() !== "list") return;
-                        try {
-                            if (typeof mettreAJourAnimationTickets === "function") mettreAJourAnimationTickets();
-                            if (typeof scanRappelsRdv === "function") scanRappelsRdv();
-                        } catch (e) {
-                            console.error("Erreur relance périodique (vue liste):", e);
-                        }
-                    }, 30000);
-                }
-                // Nettoyer l’autre intervalle
-                clearInterval(window.__intervalTicket);
-                window.__intervalTicket = null;
-            }
-
-            // Vue fiche ticket
-            if (vue === "form") {
-                if (!window.__intervalTicket) {
-                    window.__intervalTicket = setInterval(() => {
-                        if (verifierUrl() !== "form") return;
-                        try {
-                            if (typeof ajouterBoutonTraiter === "function") ajouterBoutonTraiter();
-                            if (typeof modifierBoutonCloture === "function") modifierBoutonCloture();
-                            if (typeof masquerBoutonsTimer === "function") masquerBoutonsTimer();
-
-                            // Restaurer état si nécessaire
-                            if (typeof obtenirTicketId === "function" && typeof recupererEtat === "function") {
-                                const ticketId = obtenirTicketId();
-                                if (ticketId && recupererEtat(ticketId)) {
-                                    const boutonTraiter = document.getElementById('btn-traiter-appel');
-                                    if (boutonTraiter) {
-                                        boutonTraiter.innerText = 'Mettre en Attente';
-                                        boutonTraiter.className = 'btn btn-warning';
-                                        if (typeof ajouterTexteClignotant === "function") ajouterTexteClignotant();
-                                    }
-                                }
-                            }
-                        } catch (e) {
-                            console.error("Erreur relance périodique (fiche ticket):", e);
-                        }
-                    }, 35000);
-                }
-                // Nettoyer l’autre intervalle
-                clearInterval(window.__intervalListe);
-                window.__intervalListe = null;
-            }
-        } catch (err) {
-            console.error("Erreur relanceScript:", err);
-        }
-    }
-
-    // --- Initialisation des relances ---
-    window.addEventListener('load', () => relancerScript(true));
-    window.addEventListener('hashchange', () => relancerScript(true));
-
-    const observer = new MutationObserver(mutations => {
-        for (const mutation of mutations) {
-            if (mutation.addedNodes.length > 0) {
-                relancerScript();
-                break;
-            }
-        }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    relancerScript(true);
-
+   
 })();
