@@ -1440,7 +1440,7 @@
                         } catch (e) {
                             console.error("Erreur relance périodique (vue liste):", e);
                         }
-                    }, 15000);
+                    }, 30000);
                 }
                 // Nettoyer l’autre intervalle
                 clearInterval(window.__intervalTicket);
@@ -1472,7 +1472,7 @@
                         } catch (e) {
                             console.error("Erreur relance périodique (fiche ticket):", e);
                         }
-                    }, 30000);
+                    }, 35000);
                 }
                 // Nettoyer l’autre intervalle
                 clearInterval(window.__intervalListe);
