@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Odoo Bouton Traiter l'Appel
 // @namespace    http://tampermonkey.net/
-// @version      1.16.24
+// @version      1.16.25
 // @description  Ajoute un bouton "Traiter l'appel" avec texte clignotant
 // @author       Alexis&Pierre
 // @match        https://wspharma.odoo.com/*
@@ -440,7 +440,7 @@
 
             // Ajouter l'image de chargement
             const loadingImg = document.createElement('img');
-            loadingImg.src = 'https://i.gifer.com/5EjY.gif';
+            loadingImg.src = 'https://i.gifer.com/UV02.gif';
             loadingImg.style.width = '35px';
             loadingImg.style.height = '35px';
             loadingImg.style.flexShrink = '0';
